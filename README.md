@@ -34,9 +34,50 @@ Seismic event prediction front-end and model server.
 - Avoid committing virtual environments: `.venv/` and `backend/venv/` are in `.gitignore`.
 - If you run into large-file errors when pushing to GitHub, consider using Git LFS for very large models or removing vendor binaries.
 
+## API — `/predict` (POST)
+
+- **Endpoint**: `POST http://127.0.0.1:5000/predict`
+- **Request body (JSON)**:
+  ```json
+  {
+    "features": [ /* 900 numeric values */ ]
+  }
+  ```
+  - The server expects exactly **900 numeric features** (the model reshapes this to `(1, 300, 3)`).
+
+- **Response (JSON)**:
+  ```json
+  {
+    "distance": 123.45,
+    "magnitude": 4.5,
+    "azimuth": 123.0,
+    "depth": 10.0
+  }
+  ```
+  - All four values are returned as floats.
+
+- **Errors**:
+  - `400 Bad Request` when the `features` array is missing or not length 900.
+  - `500 Internal Server Error` on unexpected model/server errors.
+
+- **Example (curl)**:
+  ```bash
+  curl -X POST http://127.0.0.1:5000/predict \
+    -H "Content-Type: application/json" \
+    -d "{\"features\": [0,0,0, ..., 0]}"
+  ```
+
+- **Example (Python using requests)**:
+  ```python
+  import requests
+  data = {"features": [0.0]*900}
+  r = requests.post('http://127.0.0.1:5000/predict', json=data)
+  print(r.json())
+  ```
+
 ## Next steps
-- Add a `README` section documenting the API (input/output schema). I can add that if you want.
-- I can also add a `.github/workflows/` CI file to run tests / linting.
+- Add a small **API usage** example in the front-end that calls `/predict` and displays results.
+- Add a `.github/workflows/` CI file to run simple checks (lint/tests) on push.
 
 ---
 Created and updated by GitHub Copilot (Raptor mini Preview).
