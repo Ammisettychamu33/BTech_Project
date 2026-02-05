@@ -1,0 +1,23 @@
+# Virtual environments
+backend/venv/
+venv/
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# IDE
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Node
+node_modules/
+
+# Model files if you ever want to ignore
+# backend/eq_model.h5
