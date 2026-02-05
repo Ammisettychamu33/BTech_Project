@@ -1,13 +1,19 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from tensorflow.keras.models import load_model
 import numpy as np
 
 app = Flask(__name__)
 CORS(app)
 
-# Load the model
-model = load_model("eq_model.h5", compile=False)
+# Model will be loaded lazily to avoid importing heavy deps during tests/CI
+model = None
+MODEL_PATH = "eq_model.h5"
+
+try:
+    # Optional import; if TensorFlow isn't installed in the environment, tests can still run
+    from tensorflow.keras.models import load_model as _load_model
+except Exception:
+    _load_model = None
 
 # Define the exact number of features the model expects
 EXPECTED_FEATURES = 900
@@ -34,6 +40,16 @@ def predict():
 
         # 3. Early Features Input: Create another placeholder.
         early_features_input = np.zeros((1, 3))
+
+        # Ensure model and TensorFlow are available and load lazily
+        global model
+        if _load_model is None:
+            return jsonify({"error": "TensorFlow is not installed in this environment. Install requirements to run the model."}), 500
+        try:
+            if model is None:
+                model = _load_model(MODEL_PATH, compile=False)
+        except Exception as e:
+            return jsonify({"error": f"Failed to load model: {str(e)}"}), 500
 
         # Predict by passing a list of the three inputs
         prediction = model.predict([waveform_input, coord_input, early_features_input])
