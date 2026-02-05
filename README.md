@@ -1,5 +1,7 @@
 # BTech_Project
 
+[![CI](https://github.com/Ammisettychamu33/BTech_Project/actions/workflows/ci.yml/badge.svg)](https://github.com/Ammisettychamu33/BTech_Project/actions/workflows/ci.yml)
+
 Seismic event prediction front-end and model server.
 
 ## Quick start (Windows) ✅
